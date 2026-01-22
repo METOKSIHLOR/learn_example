@@ -1,2 +1,9 @@
 .env
 /idea/
+__pycache__/
+*.pyc
+
+.venv/
+
+.idea/*
+!.idea/.gitignore
