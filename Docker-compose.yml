@@ -42,7 +42,7 @@ services:
     restart: always
     command: [ "-c", "/server.conf" ]
     volumes:
-      - ${PWD}/nats/server.conf:/server.conf:ro
+      - ./app/nats/server.conf:/server.conf:ro
       - nats_data:/data/jetstream
     ports:
       - "4222:4222"
