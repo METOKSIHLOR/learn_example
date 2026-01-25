@@ -1,31 +1,38 @@
-from app.nats.connect import js
+from app.nats import connect as c
 import asyncio
 
 from nats.aio.msg import Msg
 
+shutdown_event = asyncio.Event()
 
 async def users_sub():
-    async def users_handler(msg: Msg) -> None:
+    sub = await c.js.pull_subscribe("user.*", durable="users-service")
+    while not shutdown_event.is_set():
         try:
-            sub = msg.subject
-            data = msg.data.decode()
-            print(f"{sub}: {data}")
-            await msg.ack()
-        except Exception:
-            await msg.nak(delay=5)
+            msgs = await sub.fetch(1, timeout=1)
+            for msg in msgs:
+                try:
+                    data = msg.data.decode()
+                    print(f"{msg.subject}: {data}")
+                    await msg.ack()
+                except Exception:
+                    await msg.nak(delay=5)
+        except TimeoutError:
+            continue
 
-    await js.subscribe("user.*", cb=users_handler, durable="user-service")
 
 async def items_sub():
-    async def items_handler(msg: Msg) -> None:
+    sub = await c.js.pull_subscribe("item.*", durable="items-service")
+    while not shutdown_event.is_set():
         try:
-            sub = msg.subject
-            data = msg.data.decode()
-            print(f"{sub}: {data}")
-            await msg.ack()
-        except Exception:
-            await msg.nak(delay=5)
-
-    await js.subscribe("item.*", cb=items_handler, durable="items-service")
-
+            msgs = await sub.fetch(1, timeout=1)
+            for msg in msgs:
+                try:
+                    data = msg.data.decode()
+                    print(f"{msg.subject}: {data}")
+                    await msg.ack()
+                except Exception:
+                    await msg.nak(delay=5)
+        except TimeoutError:
+            continue
 

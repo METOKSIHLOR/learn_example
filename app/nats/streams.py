@@ -1,23 +1,32 @@
 from nats.js.api import StreamConfig
-from app.nats.connect import js
+from app.nats import connect as c
+from nats.js.errors import ObjectAlreadyExists
 
 async def users_stream():
-    await js.add_stream(
-        StreamConfig(
-            name="USERS",
-            subjects=["user.*"],
-            max_age=7 * 24 * 3600,
+    try:
+        await c.js.add_stream(
+            StreamConfig(
+                name="USERS",
+                subjects=["user.*"],
+                max_age=7 * 24 * 3600,
+            )
         )
-    )
-    print("Users stream created")
+    except ObjectAlreadyExists:
+        print("Users stream already exists, skipping")
+    else:
+        print("Users stream created")
 
 async def items_stream():
-    await js.add_stream(
-        StreamConfig(
-            name="ITEMS",
-            subjects=["item.*"],
-            max_age=7 * 24 * 3600,
+    try:
+        await c.js.add_stream(
+            StreamConfig(
+                name="ITEMS",
+                subjects=["item.*"],
+                max_age=7 * 24 * 3600,
+            )
         )
-    )
-    print("Items stream created")
+    except ObjectAlreadyExists:
+        print("Users stream already exists, skipping")
+    else:
+        print("Items stream created")
 

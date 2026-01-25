@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Response, Cookie, APIRouter
+from fastapi import FastAPI, Depends, HTTPException, Response, Cookie, APIRouter, BackgroundTasks
 import uuid
 
 from sqlalchemy.exc import IntegrityError
@@ -8,12 +8,18 @@ from app.api.autorization.hash import verify_password
 from app.api.dependencies import get_session, get_current_user
 from app.api.schemas import UserCreate, UserCreateResponse, UserCreds, UserInfoResponse
 from app.api.storage import storage
+from app.db.models import User
 from app.db.repository import UserRepository
+from app.nats.pub import nats_publish
+import json
 
 router = APIRouter(tags=["user"], prefix="/user")
 
 @router.post("/registration", status_code=status.HTTP_201_CREATED, response_model=UserCreateResponse)
-async def registration(schema: UserCreate, session = Depends(get_session)):
+async def registration(schema: UserCreate,
+                       background_tasks: BackgroundTasks,
+                       session = Depends(get_session),
+                       ):
     repo = UserRepository(session)
     try:
         user = await repo.create_user(schema)
@@ -22,6 +28,14 @@ async def registration(schema: UserCreate, session = Depends(get_session)):
     except IntegrityError:
         await session.rollback()
         raise HTTPException(status_code=400, detail="Username already exists")
+
+    data = {
+        "id": user.id,
+        "username": user.username,
+        "role": user.role,
+    }
+
+    background_tasks.add_task(nats_publish, "user.create", data)
     return user
 
 @router.post("/login", status_code=status.HTTP_200_OK)
