@@ -2,8 +2,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from app.config.config import config
 
-print("DATABASE MODULE ID:", id(__name__))
-
 engine: AsyncEngine | None = None
 SessionFactory: async_sessionmaker[AsyncSession] | None = None
 
@@ -19,7 +17,6 @@ async def connect_db() -> None:
         class_=AsyncSession,
         expire_on_commit=False,
     )
-    print("SessionFactory:", SessionFactory)
 
 async def close_db() -> None:
     if engine:

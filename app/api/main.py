@@ -1,17 +1,20 @@
-from fastapi import FastAPI, Depends, HTTPException, Response, Cookie
-import uuid
-from starlette import status
+from fastapi import FastAPI
 
-from app.api.dependencies import get_session, get_current_user
 from app.api.routers.users import router as user_router
 from app.api.routers.items import router as item_router
-from app.api.schemas import UserCreate, UserCreateResponse, UserCreds, UserInfoResponse
-from app.db.repository import UserRepository
 from app.db.session import close_db, connect_db
+from app.nats.connect import create_nats, close_nats
+from app.nats.sub import users_sub, items_sub
+
+
 async def lifespan(app: FastAPI):
     await connect_db()
+    await create_nats()
+    await users_sub()
+    await items_sub()
     yield
     await close_db()
+    await close_nats()
 
 app = FastAPI(lifespan=lifespan)
 
