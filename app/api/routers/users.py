@@ -58,6 +58,9 @@ async def login(schema: UserCreds, response: Response, session = Depends(get_ses
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response, session_id = Cookie(None)):
+    if session_id is None:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
     response.delete_cookie(key="session_id")
 
     if session_id:
