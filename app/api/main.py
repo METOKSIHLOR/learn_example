@@ -18,8 +18,8 @@ async def lifespan(app: FastAPI):
     shutdown_event.set()
     await close_nats()
 
+
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
 app.include_router(item_router)
-

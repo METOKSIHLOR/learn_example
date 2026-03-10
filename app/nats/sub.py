@@ -1,7 +1,6 @@
 from app.nats import connect as c
 import asyncio
 
-from nats.aio.msg import Msg
 
 shutdown_event = asyncio.Event()
 

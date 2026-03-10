@@ -1,5 +1,4 @@
 import json
-from typing import Dict
 from app.nats import connect as c
 
 async def nats_publish(subject: str, data: dict) -> None:

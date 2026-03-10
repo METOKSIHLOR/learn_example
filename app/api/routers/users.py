@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Response, Cookie, APIRouter, BackgroundTasks
+from fastapi import Depends, HTTPException, Response, Cookie, APIRouter, BackgroundTasks
 import uuid
 
 from sqlalchemy.exc import IntegrityError
@@ -8,10 +8,8 @@ from app.api.autorization.hash import verify_password
 from app.api.dependencies import get_session, get_current_user
 from app.api.schemas import UserCreate, UserCreateResponse, UserCreds, UserInfoResponse
 from app.api.storage import storage
-from app.db.models import User
 from app.db.repository import UserRepository
 from app.nats.pub import nats_publish
-import json
 
 router = APIRouter(tags=["user"], prefix="/user")
 

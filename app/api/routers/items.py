@@ -1,13 +1,11 @@
 from typing import List
-
 from fastapi import APIRouter, HTTPException
-from fastapi.params import Depends, Query
+from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.background import BackgroundTasks
 
 from app.api.dependencies import get_session, check_user_role
-from app.api.schemas import UserCreateResponse, ItemSchema, ItemResponse
-from app.db.models import Item
+from app.api.schemas import ItemSchema, ItemResponse
 from app.db.repository import ItemRepository
 from app.nats.pub import nats_publish
 
