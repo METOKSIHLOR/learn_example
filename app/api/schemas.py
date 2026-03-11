@@ -29,6 +29,10 @@ class ItemSchema(BaseModel):
     price: float
     in_stock: bool = True
 
+class ItemUpdateSchema(BaseModel):
+    name: str | None = None
+    price: float | None = None
+    in_stock: bool | None = None
 
 class ItemResponse(BaseModel):
     id: int
