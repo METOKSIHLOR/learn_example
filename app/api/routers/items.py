@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.background import BackgroundTasks
 
 from app.api.dependencies import get_session, check_user_role
-from app.api.schemas import ItemSchema, ItemResponse
+from app.api.schemas import ItemSchema, ItemUpdateSchema, ItemResponse
 from app.db.repository import ItemRepository
 from app.nats.pub import nats_publish
 
@@ -43,8 +43,8 @@ async def create_item(background_tasks: BackgroundTasks, item: ItemSchema, sessi
     background_tasks.add_task(nats_publish, "item.create", data)
     return item
 
-@router.put("/{item_id}", response_model=ItemResponse)
-async def update_item(background_tasks: BackgroundTasks, item_id: int, item: ItemSchema, session: AsyncSession = Depends(get_session)):
+@router.patch("/{item_id}", response_model=ItemResponse)
+async def update_item(background_tasks: BackgroundTasks, item_id: int, item: ItemUpdateSchema, session: AsyncSession = Depends(get_session)):
     repo = ItemRepository(session)
     old_item = await repo.get_item(item_id)
     if old_item is None:
